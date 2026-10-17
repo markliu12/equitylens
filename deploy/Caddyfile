@@ -1,0 +1,16 @@
+# 换成你的域名；未备案时先用 :80 + IP 访问，或改 internal 走自签证书
+example.com {
+	encode zstd gzip
+
+	# SSE 必须关闭缓冲，否则前端时间线不会实时刷新
+	reverse_proxy 127.0.0.1:8000 {
+		flush_interval -1
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}

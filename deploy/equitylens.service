@@ -1,0 +1,23 @@
+[Unit]
+Description=EquityLens research workbench
+After=network.target
+
+[Service]
+Type=simple
+User=equitylens
+Group=equitylens
+WorkingDirectory=/opt/equitylens
+EnvironmentFile=/etc/equitylens.env
+Environment=PYTHONUTF8=1
+Environment=PYTHONUNBUFFERED=1
+# 必须单 worker：内存任务表不支持多进程
+ExecStart=/opt/equitylens/.venv/bin/uvicorn equitylens.api.app:create_app --factory --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/equitylens
+
+[Install]
+WantedBy=multi-user.target
