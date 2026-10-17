@@ -5,6 +5,7 @@
 
 [![CI](https://github.com/markliu12/equitylens/actions/workflows/ci.yml/badge.svg)](https://github.com/markliu12/equitylens/actions/workflows/ci.yml)
 [![tests](https://img.shields.io/badge/tests-97%20passed-brightgreen)](#测试)
+[![coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](#测试)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#快速开始)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -216,8 +217,9 @@ docs/             架构 / 引擎设计 / ADR / 部署说明
 ## 测试
 
 ```bash
-pytest -q        # 97 passed
-ruff check src   # 0 error
+pytest -q --cov=src/equitylens --cov-report=term-missing   # 97 passed, 84% coverage
+ruff check src tests                                        # 0 error
+mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 ```
 
 覆盖的关键断言：

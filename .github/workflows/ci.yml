@@ -35,10 +35,21 @@ jobs:
       - name: Lint
         run: ruff check src tests
 
-      - name: Test (offline, no API key required)
+      - name: Type check
+        run: mypy src/equitylens/engine src/equitylens/agents/schemas.py
+        continue-on-error: true
+
+      - name: Test with coverage (offline, no API key required)
         env:
           APP_MODE: offline
-        run: pytest -q
+        run: pytest -q --cov=src/equitylens --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
 
       - name: CLI smoke test
         env:
