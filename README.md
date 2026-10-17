@@ -3,7 +3,7 @@
 > **不依赖 LangChain / LangGraph，手写 DAG 编排引擎的行业研究多智能体系统。**
 > 每条结论强制挂 `evidence_id`，全程可 checkpoint、可断点恢复、可回放、可评测、成本可控。
 
-[![CI](https://github.com/markliu12/equitylens/actions/workflows/ci.yml/badge.svg)](https://github.com/markliu12/equitylens/actions/workflows/ci.yml)
+[![CI](https://github.com/markliu12/equitylens/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/markliu12/equitylens/actions/workflows/ci.yml)
 [![tests](https://img.shields.io/badge/tests-106%20passed-brightgreen)](#测试)
 [![coverage](https://codecov.io/gh/markliu12/equitylens/branch/main/graph/badge.svg)](https://codecov.io/gh/markliu12/equitylens)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#快速开始)
