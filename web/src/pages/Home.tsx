@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { createRun, getExamples, getModels, listRuns } from "../api/client";
+import { createRun, getExamples, getGraph, getModels, listRuns } from "../api/client";
 import type { RunRecord } from "../api/types";
 import { StatusPill } from "../components/StatusPill";
 
@@ -16,6 +16,10 @@ export function Home({ navigate }: { navigate: (path: string) => void }) {
   const [examples, setExamples] = useState<Example[]>([]);
   const [runs, setRuns] = useState<RunRecord[]>([]);
   const [models, setModels] = useState<{ models: string[]; offline: boolean } | null>(null);
+  // 节点数从 /api/meta/graph 拿，不再写死。
+  // 之前这里硬编码 13，加了 derive_signals 之后首页一直显示错数字——
+  // 一个"可观测"的系统，自己的首页却在展示过期指标，很讽刺。
+  const [nodeCount, setNodeCount] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,6 +27,9 @@ export function Home({ navigate }: { navigate: (path: string) => void }) {
     getExamples().then((data) => setExamples(data.examples)).catch(() => undefined);
     getModels().then(setModels).catch(() => undefined);
     listRuns().then((data) => setRuns(data.runs)).catch(() => undefined);
+    getGraph()
+      .then((data) => setNodeCount(data.nodes.length))
+      .catch(() => undefined);
   }, []);
 
   const submit = async () => {
@@ -42,13 +49,14 @@ export function Home({ navigate }: { navigate: (path: string) => void }) {
   return (
     <div className="wrap">
       <div className="card hero">
-        <span className="eyebrow">手写 DAG 编排引擎 · 9 个 Agent · 强制引用溯源</span>
+        <span className="eyebrow">每条结论可溯源 · 断点恢复 · 成本硬上限</span>
         <h1>
-          把一次行业研究，拆成 <span>13 个可观测、可恢复</span> 的节点
+          把一次行业研究，拆成 <span>{nodeCount ?? "—"} 个可观测、可恢复</span> 的节点
         </h1>
         <p className="lede">
-          EquityLens 不使用 LangChain / LangGraph。调度、checkpoint、降级、预算全部自己实现；
-          每条结论都必须挂到可核验的原文上，跑完能给出引用覆盖率与命中率。
+          每条结论都必须挂到可核验的原文上，跑完给出引用覆盖率与命中率；
+          中途崩了可以接着跑，已完成的节点不会重复花钱。
+          底下是一套手写的 DAG 调度器，不依赖编排框架——所以这些机制都能被单独测试。
         </p>
 
         <div className="stack">
@@ -97,7 +105,7 @@ export function Home({ navigate }: { navigate: (path: string) => void }) {
 
         <div className="hero-stats">
           <div>
-            <strong>13</strong> 编排节点
+            <strong>{nodeCount ?? "—"}</strong> 编排节点
           </div>
           <div>
             <strong>3</strong> 级证据校验

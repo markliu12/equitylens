@@ -37,6 +37,10 @@ export function getExamples(): Promise<{ examples: { question: string; as_of: st
   return request("/api/meta/examples");
 }
 
+export function getGraph(): Promise<{ nodes: { id: string; kind: string; label: string }[] }> {
+  return request("/api/meta/graph");
+}
+
 export function getModels(): Promise<{
   models: string[];
   offline: boolean;
