@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -163,8 +164,8 @@ class Scheduler:
                 task.cancel()
             if running:
                 await asyncio.gather(*running.keys(), return_exceptions=True)
-            for node_id, status in statuses.items():
-                if status is NodeStatus.RUNNING:
+            for node_id, node_status in statuses.items():
+                if node_status is NodeStatus.RUNNING:
                     statuses[node_id] = NodeStatus.CANCELLED
             await self._persist(run_id, bb, statuses, None)
             raise
@@ -379,7 +380,7 @@ class Scheduler:
         return budget.snapshot() if budget is not None else {}
 
 
-def _usage_from_meta(meta: dict[str, Any]) -> Usage:
+def _usage_from_meta(meta: Mapping[str, Any]) -> Usage:
     raw = meta.get("usage") or {}
     if not isinstance(raw, dict):
         return Usage()

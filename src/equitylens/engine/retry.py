@@ -36,8 +36,8 @@ class RetryPolicy:
     )
 
     def delay_for(self, attempt: int) -> float:
-        raw = min(self.base_delay * (2 ** max(0, attempt - 1)), self.max_delay)
-        return raw + random.uniform(0, raw * self.jitter)
+        raw = min(self.base_delay * (2.0 ** max(0, attempt - 1)), self.max_delay)
+        return raw + random.uniform(0.0, raw * self.jitter)
 
 
 async def run_with_retry[T](

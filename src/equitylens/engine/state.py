@@ -230,7 +230,7 @@ class Blackboard:
     def snapshot(self) -> dict[str, Any]:
         return copy.deepcopy(self._state)
 
-    def merge_overlay(self, overlay: Mapping[str, Any], patch: Patch) -> None:
+    def merge_overlay(self, overlay: dict[str, Any], patch: Patch) -> None:
         """LoopNode 内部使用：把 patch 按 reducer 合进本地 overlay，不触碰主状态。"""
         for name, value in patch.channels.items():
             reducer = self._schema.reducer(name)
