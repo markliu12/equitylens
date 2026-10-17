@@ -114,21 +114,6 @@ flowchart LR
 
 ---
 
-## 与灵感来源的差异
-
-项目结构上参考了 [TradingAgents](https://github.com/TauricResearch/TradingAgents)（11.1 万 star）
-的"分析师并行 → 多空辩论 → 风控 → 组合经理"思路。**未复制其任何源码**，实现层面有六处刻意不同：
-
-| 维度 | TradingAgents | EquityLens |
-|---|---|---|
-| 编排 | LangGraph 图 + checkpointer | 自研 DAG 引擎（调度 / 状态 / checkpoint / 降级全部自己写） |
-| 状态 | LangGraph State（TypedDict + reducer） | Blackboard + 只读视图 + 写权限校验 |
-| 领域 | 美股为主，交易决策 | A 股行业研究，明确**不做交易决策** |
-| 引用 | 报告引用数据源 | `evidence_id` 内容哈希 + quote 命中校验 + 前视偏差检查 |
-| 成本 | 无硬预算 | 调用前预算拦截 + 降级链 + 熔断 |
-| 可复现 | LLM 采样不可复现 | 离线确定性模型 + fixture，CI 可断言 |
-
----
 
 ## 快速开始
 
