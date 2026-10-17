@@ -1,5 +1,5 @@
 site_name: EquityLens 研镜
-site_description: 每条结论都能点回原文的 A 股研究报告系统
+site_description: 面向 A 股的研报生成与引用溯源系统
 site_url: https://markliu12.github.io/equitylens/
 repo_url: https://github.com/markliu12/equitylens
 repo_name: markliu12/equitylens
@@ -60,6 +60,9 @@ exclude_docs: |
 markdown_extensions:
   - admonition
   - attr_list
+  # 首页用 <div class="grid cards" markdown> 排版导航卡片，
+  # 没有这个扩展时 HTML 块内的 Markdown 不解析，链接和加粗会原样显示成 [文本](链接)
+  - md_in_html
   - def_list
   - footnotes
   - tables
