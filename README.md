@@ -3,7 +3,7 @@
 > **不依赖 LangChain / LangGraph，手写 DAG 编排引擎的行业研究多智能体系统。**
 > 每条结论强制挂 `evidence_id`，全程可 checkpoint、可断点恢复、可回放、可评测、成本可控。
 
-[![tests](https://img.shields.io/badge/tests-69%20passed-brightgreen)](#测试)
+[![tests](https://img.shields.io/badge/tests-97%20passed-brightgreen)](#测试)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#快速开始)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -179,7 +179,7 @@ cp .env.example .env
 #   LLM_MODEL=deepseek-chat
 ```
 
-> 真实数据源（akshare / 巨潮）在下一阶段接入，见 [docs/data-sources.md](docs/data-sources.md)。
+> 真实数据源 akshare 已适配（`DATA_PROVIDER=akshare`），需 `pip install akshare`（建议 Python 3.12）。详见 [docs/data-sources.md](docs/data-sources.md)。
 
 ---
 
@@ -206,7 +206,7 @@ src/equitylens/
 └─ fixtures/      示例数据集（合成数据）
 
 web/              Vite + React + TS（无 UI 框架，手写 CSS）
-tests/            69 个测试：单元 + 集成 + 离线端到端
+tests/            97 个测试：单元 + 集成 + 离线端到端
 docs/             架构 / 引擎设计 / ADR / 部署说明
 ```
 
@@ -215,7 +215,7 @@ docs/             架构 / 引擎设计 / ADR / 部署说明
 ## 测试
 
 ```bash
-pytest -q        # 69 passed
+pytest -q        # 97 passed
 ruff check src   # 0 error
 ```
 
@@ -247,7 +247,7 @@ ruff check src   # 0 error
 - [x] 9 个 Agent + 多空辩论 + 合规风控
 - [x] 强制引用溯源 + 审计 JSON
 - [x] FastAPI + SSE + React 前端 + 离线 fixture 全链路
-- [ ] 真实数据源（akshare / 巨潮）与限流、反爬兜底
+- [~] 真实数据源 akshare 已适配（Provider + 降级 + 契约测试）；巨潮公告待接
 - [ ] 25 题评测集 + RAGAS 风格指标 + 配对 bootstrap A/B
 - [ ] 公网部署（回放模式 + 邀请码 + 日预算）
 - [ ] 技术面分析师（代码位已留，默认关闭）
