@@ -1,0 +1,82 @@
+name: Bug report
+description: 报告一个可复现的问题
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。为了让问题能被快速定位，请尽量提供可复现的最小信息。
+
+        **请先确认**：`equitylens doctor` 能通过、`pytest -q` 在本地是绿的。
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 运行模式
+      description: 出问题时的 APP_MODE
+      options:
+        - offline（本地 fixture，零外网）
+        - dev（真实模型 + 真实数据）
+        - demo（邀请码 + 预算约束）
+        其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 实际发生了什么
+      description: 报错信息、异常堆栈、或不符合预期的输出
+      placeholder: |
+        运行命令 / run_id / 报错原文
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你期望发生什么
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. pip install -e ".[dev]"
+        2. equitylens run "..." --offline
+        3. 看到 ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / commit
+      placeholder: 例如 main@3872c44 或 v0.1.0
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options: [Linux, macOS, Windows, Docker, 其他]
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python 版本
+      placeholder: "3.12"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 自查
+      options:
+        - label: 我已在 offline 模式下复现（不依赖真实 API Key）
+          required: false
+        - label: 我已搜索过现有 issue
+          required: true

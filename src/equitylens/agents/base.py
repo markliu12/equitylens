@@ -33,6 +33,28 @@ def evidence_brief(evidence: list[dict[str, Any]], limit: int = 8) -> list[dict[
     ]
 
 
+def derived_view(view: Any) -> dict[str, Any]:
+    """把派生信号压成"原始 + 派生"一张扁平表，供需要做交叉判断的角色使用。
+
+    辩论双方和终裁都要用同一份派生结果。各自拼一遍的结果是：某天给
+    signals.py 加一个字段，只改了两处，第三处悄悄没有——判断口径就分叉了。
+    """
+    derived = (view.get("research_data") or {}).get("derived") or {}
+    if not derived:
+        return {}
+    return {
+        "signals": {
+            **(derived.get("raw") or {}),
+            **(derived.get("derived") or {}),
+        },
+        "derived": {
+            "flags": derived.get("flags") or [],
+            "basis": derived.get("derived_basis") or {},
+            "unavailable": derived.get("unavailable") or [],
+        },
+    }
+
+
 class BaseAgent(AgentNode):
     prompt_name: str = ""
     schema_name: str = ""

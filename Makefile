@@ -1,7 +1,7 @@
 # Windows 上没有 make 也能用，这里只是给习惯的人一个统一入口。
 PY ?= python
 
-.PHONY: install dev test lint fmt typecheck web serve run-offline doctor
+.PHONY: install dev test lint fmt typecheck web serve run-offline doctor docs
 
 install:
 	$(PY) -m pip install -e ".[dev]"
@@ -29,3 +29,9 @@ run-offline:
 
 doctor:
 	$(PY) -m equitylens.cli doctor
+
+docs:
+	$(PY) -m mkdocs serve
+
+docs-build:
+	$(PY) -m mkdocs build --strict

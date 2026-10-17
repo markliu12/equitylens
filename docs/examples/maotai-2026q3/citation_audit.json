@@ -1,0 +1,17 @@
+{
+  "total_claims": 19,
+  "grounded_claims": 19,
+  "coverage": 1.0,
+  "quotes_checked": 19,
+  "quotes_hit": 19,
+  "quote_hit_rate": 1.0,
+  "unknown_ids": [],
+  "future_leaks": [],
+  "by_tier": {
+    "2": 14,
+    "3": 13,
+    "1": 3
+  },
+  "issues": [],
+  "passed": true
+}

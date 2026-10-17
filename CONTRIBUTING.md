@@ -14,9 +14,9 @@ pip install -e ".[dev]"
 Verify everything works:
 
 ```bash
-pytest -q                    # 97 passed
-ruff check src tests         # 0 errors
-mypy src/equitylens/engine   # type check (advisory)
+pytest -q                    # 124 passed
+ruff check src tests evals   # 0 errors
+mypy                         # 0 errors (engine / schemas / llm / tools)
 ```
 
 ## Project structure
@@ -26,7 +26,7 @@ src/equitylens/
   engine/      DAG orchestration core (no LLM/tool deps — pure asyncio)
   llm/         OpenAI-compat client, model router, offline model, structured output
   agents/      9 agents: planner, retriever, 3 analysts, bull/bear/judge, verdict, risk, editor
-  tools/       Provider protocol, fixture, akshare, evidence chain, cache, rate limiter
+  tools/       Provider protocol, fixture, akshare, evidence chain, derived signals, cache, limiter
   graph/       Research DAG assembly (single wiring point)
   report/      Citation audit + Markdown/HTML renderer
   api/         FastAPI + SSE + run manager
@@ -60,6 +60,21 @@ and its tests, that's two commits: `feat(agents): ...` then `test: ...`.
 3. Add contract tests in `tests/unit/test_your_source.py` (test field structure, not live data)
 4. Update `.env.example` with the new `DATA_PROVIDER=your_source` option
 
+## How to add a derived signal
+
+Derived signals live in `tools/signals.py` and are the only place where cross-dimensional
+arithmetic happens. If you find yourself asking the model to compute a ratio, it probably
+belongs here instead.
+
+1. Add the raw inputs to the fixture seed (`fixtures/seeds/data.py`) and to the provider contract
+2. Compute the value in `derive_signals()`; put the formula into `basis` so the report can explain it
+3. If it implies a judgment, add a flag with an explicit threshold at the top of the module
+4. Add the corresponding sentence template in `llm/offline.py` (both analyst and verdict paths)
+5. Add a unit test in `tests/unit/test_signals.py` — thresholds are business logic, lock them down
+
+**Never fill a missing input with 0 or a default.** Record it in `unavailable` and skip the
+derived item. A wrong zero is far worse than an honest gap.
+
 ## How to add a new agent
 
 1. Create `agents/your_agent.py`, extending `BaseAgent`
@@ -75,6 +90,16 @@ and its tests, that's two commits: `feat(agents): ...` then `test: ...`.
 3. Ensure `pytest -q` and `ruff check src tests` pass
 4. Write a clear PR description: what changed, why, how to test
 5. Link any related issues
+
+## Changing prompts
+
+Prompts are versioned by content hash (`llm/prompts.py`), and the version is written into the
+run trace — so an A/B result can be attributed to a prompt change rather than guessed at.
+
+Prompt edits that change output *shape* will be caught by `tests/unit/test_report_quality.py`.
+That file asserts things like "no claim appears in two sections" and "core conclusions cite at
+least two sources". If your change is intentionally breaking one of those properties, the test
+is the place to argue about it — not a silent regression.
 
 ## Testing philosophy
 

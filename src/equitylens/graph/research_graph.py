@@ -90,6 +90,44 @@ class ResolveEntityNode(ToolNode):
         return Patch(channels={"entity": entity}, meta={"entity": entity})
 
 
+class DeriveSignalsNode(ToolNode):
+    """派生信号：把三个维度的原始数据交叉成判断标签。
+
+    位置刻意放在 analysts 之前而不是塞进每个分析师内部：
+    交叉判断需要同时看到基本面、行业、舆情三份数据，而三个 retriever 是并行 FanOut，
+    单个分析师只能看到自己那一份。放这里还有一个好处——它只跑一次，
+    三个分析师共享同一份派生结果，不会出现"基本面算出一个超额增速、行业算出另一个"。
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            "derive_signals",
+            deps=("evidence_merge",),
+            reads=("research_data", "entity", "as_of"),
+            writes=("research_data",),
+            policy=NodePolicy(timeout_s=10, on_failure=OnFailure.SKIP),
+            label="派生信号",
+        )
+
+    async def invoke(self, ctx: NodeContext) -> Patch:
+        from equitylens.tools.signals import derive_signals
+
+        research = ctx.view.get("research_data") or {}
+        payload = derive_signals(
+            fundamental=research.get("fundamental") or {},
+            industry=research.get("industry") or {},
+            sentiment=research.get("sentiment") or {},
+        )
+        return Patch(
+            channels={"research_data": {"derived": payload}},
+            meta={
+                "flags": payload.get("flags") or [],
+                "derived_count": len(payload.get("derived") or {}),
+                "unavailable": payload.get("unavailable") or [],
+            },
+        )
+
+
 class FactCheckNode(ToolNode):
     def __init__(self) -> None:
         super().__init__(
@@ -319,7 +357,7 @@ def build_graph() -> Graph:
             "industry": IndustryAnalyst,
             "sentiment": SentimentAnalyst,
         }[str(focus)](),
-        deps=("evidence_merge",),
+        deps=("derive_signals",),
         reads=("entity", "as_of", "evidence", "research_data", "evidence_gaps"),
         writes=("analyst_reports",),
         policy=NodePolicy(max_parallel=3, on_failure=OnFailure.SKIP),
@@ -344,6 +382,7 @@ def build_graph() -> Graph:
         PlannerAgent(),
         retrieve,
         evidence_merge,
+        DeriveSignalsNode(),
         analysts,
         analyst_merge,
         debate,
@@ -375,6 +414,9 @@ def _build_debate() -> Any:
             "bull_argument",
             "bear_argument",
             "debate_rounds",
+            # 辩论双方要引用"派生信号"里的交叉判断，不是只拿原始证据；
+            # LoopNode 的只读视图按 reads 裁剪，漏了这个通道，双方都会退化成复述
+            "research_data",
         ),
         writes=("bull_argument", "bear_argument", "debate_rounds"),
         policy=NodePolicy(timeout_s=900, max_attempts=1, on_failure=OnFailure.SKIP),

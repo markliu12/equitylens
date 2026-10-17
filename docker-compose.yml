@@ -1,0 +1,40 @@
+# 本地一键运行。
+#
+#   起服务：  docker compose up --build      → http://127.0.0.1:8000
+#   跑 CLI：  docker compose run --rm equitylens python -m equitylens.cli run "分析贵州茅台" --offline
+#
+# 默认 offline 模式：零外网、零费用、不需要 API Key。
+# 接真实模型时在 .env 里设置 APP_MODE=dev 与 LLM_API_KEY，compose 会自动读取。
+
+services:
+  equitylens:
+    build:
+      context: .
+    image: equitylens:local
+    environment:
+      APP_MODE: ${APP_MODE:-offline}
+      DB_PATH: data/equitylens.db
+      CACHE_DIR: data/cache
+      ARTIFACT_DIR: data/artifacts
+      DATA_PROVIDER: ${DATA_PROVIDER:-fixture}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-deepseek-chat}
+      BUDGET_MAX_COST_CNY: ${BUDGET_MAX_COST_CNY:-1.2}
+    ports:
+      - "8000:8000"
+    volumes:
+      # 报告、缓存与运行记录落到宿主机，容器删掉也不丢
+      - ./data:/app/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import urllib.request
+          urllib.request.urlopen("http://127.0.0.1:8000/api/healthz")
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    restart: unless-stopped

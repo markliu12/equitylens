@@ -14,6 +14,9 @@ from equitylens.agents.schemas import AnalystReport
 from equitylens.engine.node import NodeContext
 from equitylens.engine.types import NodePolicy, OnFailure, Patch
 
+#: 每个维度"自己的"证据类型。排序时本维度证据必须优先，否则会被别的维度挤掉。
+FOCUS_KIND = {"fundamental": "financial", "industry": "industry", "sentiment": "news"}
+
 
 class AnalystBase(BaseAgent):
     output_model = AnalystReport
@@ -46,16 +49,39 @@ class AnalystBase(BaseAgent):
         detail = self.detail(ctx)
         evidence = list(ctx.view.get("evidence") or [])
         gaps = list(ctx.view.get("evidence_gaps") or []) + list(detail.get("gaps") or [])
+        # 本维度证据必须优先。
+        # 旧实现把全量证据按 (tier, 日期) 排序后取前 10 条，行业分析师拿到的
+        # 全是公告和财报，同业对比那条被挤掉——"估值位置"这条结论因此永远挂不上
+        # 证据，覆盖率平白掉几个点。注意 evidence_brief 内部会重新排序，
+        # 所以不能"先拼再排"，必须分两次截断。
+        own_kind = FOCUS_KIND.get(self.focus, "")
+        own = [item for item in evidence if item.get("kind") == own_kind]
+        rest = [item for item in evidence if item.get("kind") != own_kind]
+        brief = evidence_brief(own, limit=8) + evidence_brief(rest, limit=4)
         context: dict[str, Any] = {
             "role": self.role,
             "entity": ctx.view.get("entity") or {},
             "as_of": ctx.view.get("as_of"),
-            "evidence": evidence_brief(evidence, limit=10),
+            "evidence": brief,
             "facts": detail.get("facts") or [],
             "metrics": detail.get("metrics") or [],
             "gaps": gaps,
         }
         context.update(self.extra_context(ctx, detail))
+
+        # 派生信号对所有分析师可见：交叉判断本来就跨维度，
+        # 让它只属于"基本面"会导致三个分析师各自重算、结论互相打架。
+        derived = (ctx.view.get("research_data") or {}).get("derived") or {}
+        if derived:
+            context["signals"] = {
+                **(context.get("signals") or {}),
+                **(derived.get("derived") or {}),
+            }
+            context["derived"] = {
+                "flags": derived.get("flags") or [],
+                "basis": derived.get("derived_basis") or {},
+                "unavailable": derived.get("unavailable") or [],
+            }
         return context
 
     async def run(self, ctx: NodeContext) -> Patch:
