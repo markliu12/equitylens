@@ -12,6 +12,7 @@ import contextlib
 import time
 import uuid
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Any
 
 from equitylens.engine.events import EventType
@@ -25,6 +26,7 @@ class RunManager:
     tasks: dict[str, asyncio.Task[Any]] = field(default_factory=dict)
     _semaphore: asyncio.Semaphore | None = None
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    _daily_reservations: dict[str, float] = field(default_factory=dict)
 
     @property
     def semaphore(self) -> asyncio.Semaphore:
@@ -41,14 +43,16 @@ class RunManager:
     ) -> dict[str, Any]:
         run_id = run_id or f"run_{uuid.uuid4().hex[:12]}"
         as_of = as_of or "2026-09-30"
-        await self.runtime.store.create_run(
-            run_id,
-            question=question,
-            as_of=as_of,
-            graph_version=self.runtime.graph_version,
-            config_hash=self.runtime.settings.config_hash(),
-        )
         async with self._lock:
+            if not await self._reserve_demo_budget(run_id):
+                return {"error": "daily_budget_exhausted"}
+            await self.runtime.store.create_run(
+                run_id,
+                question=question,
+                as_of=as_of,
+                graph_version=self.runtime.graph_version,
+                config_hash=self.runtime.settings.config_hash(),
+            )
             self.tasks[run_id] = asyncio.create_task(self._run(run_id, question, as_of))
         return {
             "run_id": run_id,
@@ -70,6 +74,7 @@ class RunManager:
         finally:
             async with self._lock:
                 self.tasks.pop(run_id, None)
+                self._daily_reservations.pop(run_id, None)
 
     async def cancel(self, run_id: str) -> dict[str, Any]:
         task = self.tasks.get(run_id)
@@ -93,6 +98,13 @@ class RunManager:
             if run_id in self.tasks:
                 continue
             async with self._lock:
+                if not await self._reserve_demo_budget(run_id):
+                    await self.runtime.store.mark_run(
+                        run_id,
+                        RunStatus.FAILED,
+                        error="今日演示预算不足，无法恢复运行",
+                    )
+                    continue
                 self.tasks[run_id] = asyncio.create_task(
                     self._resume(run_id, record.get("question", ""), record.get("as_of", ""))
                 )
@@ -113,6 +125,27 @@ class RunManager:
         finally:
             async with self._lock:
                 self.tasks.pop(run_id, None)
+                self._daily_reservations.pop(run_id, None)
+
+    async def _reserve_demo_budget(self, run_id: str) -> bool:
+        """Reserve one run's worst-case spend before accepting a demo request.
+
+        Reservations close the race where several concurrent requests all see
+        the same remaining budget. Finished runs are charged by their recorded
+        actual cost; active runs retain a conservative max-cost reservation.
+        """
+        settings = self.runtime.settings
+        if settings.app_mode != "demo":
+            return True
+        now = datetime.now(UTC)
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+        spent = await self.runtime.store.usage_cost_since(day_start)
+        reserved = sum(self._daily_reservations.values())
+        reservation = settings.budget_max_cost_cny
+        if spent + reserved + reservation > settings.daily_budget_cny:
+            return False
+        self._daily_reservations[run_id] = reservation
+        return True
 
     def is_running(self, run_id: str) -> bool:
         task = self.tasks.get(run_id)

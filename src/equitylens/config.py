@@ -2,8 +2,8 @@
 
 三档 APP_MODE 是刻意的分层：
 - offline：fixture 数据 + 确定性模型，零外网零费用（CI / 断网演示）
-- dev：真实数据 + 真实模型
-- demo：真实链路但默认关闭实时调用，靠预生成回放 + 邀请码护住额度
+- dev：真实模型；数据源由 Provider 决定（当前仅内置 fixture）
+- demo：默认关闭实时调用，开启后用邀请码与预算护住额度
 """
 
 from __future__ import annotations

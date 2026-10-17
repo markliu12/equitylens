@@ -52,12 +52,29 @@ sudo systemctl reload caddy
 | 层 | 做法 | 环境变量 |
 |---|---|---|
 | 1 | 默认只读回放，匿名用户零调用 | `APP_MODE=demo` |
-| 2 | 实时调用需邀请码 | `DEMO_LIVE_ENABLED=false` |
+| 2 | 实时调用需邀请码（请求头 `X-Demo-Invite-Code`） | `DEMO_LIVE_ENABLED=true` + `DEMO_INVITE_CODES` |
 | 3 | 单次运行预算硬上限 | `BUDGET_MAX_COST_CNY=1.2` |
-| 4 | 单日总预算 | `DAILY_BUDGET_CNY=10` |
+| 4 | 单日总预算（按每次运行最大成本预留，避免并发绕过） | `DAILY_BUDGET_CNY=10` |
 | 5 | 一键止血 | `DEMO_LIVE_ENABLED=false` + 重启 |
 
 > 关键原则：预算检查发生在**调用之前**（`BudgetGuard.check`），而不是事后统计。
+
+开启实时 Demo 时，先在 `/etc/equitylens.env` 设置一个不公开的邀请码：
+
+```bash
+APP_MODE=demo
+DEMO_LIVE_ENABLED=true
+DEMO_INVITE_CODES=replace-with-a-long-random-code
+```
+
+调用接口时带上该邀请码：
+
+```bash
+curl -X POST https://example.com/api/runs \
+  -H "Content-Type: application/json" \
+  -H "X-Demo-Invite-Code: replace-with-a-long-random-code" \
+  -d '{"question":"分析贵州茅台"}'
+```
 
 ## 5. 健康检查
 

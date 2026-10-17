@@ -300,6 +300,29 @@ class SqliteStore:
             for row in rows
         ]
 
+    async def usage_cost_since(self, since: float) -> float:
+        """Return the recorded LLM cost of runs touched since ``since``.
+
+        The manager uses this at admission time for the demo's daily budget.
+        Costs are stored as JSON to keep the run table portable, so summing in
+        Python also avoids relying on SQLite's optional JSON extension.
+        """
+        conn = await self._connection()
+        cursor = await conn.execute(
+            "SELECT usage_json FROM runs WHERE updated_at >= ?", (since,)
+        )
+        rows = await cursor.fetchall()
+        await cursor.close()
+        total = 0.0
+        for (usage_json,) in rows:
+            try:
+                total += float((json.loads(usage_json or "{}") or {}).get("cost_cny", 0.0))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                # Budget protection fails closed: a corrupt historic record
+                # should never permit extra paid requests.
+                return float("inf")
+        return total
+
     async def node_records(self, run_id: str) -> list[dict[str, Any]]:
         conn = await self._connection()
         cursor = await conn.execute(

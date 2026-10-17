@@ -47,40 +47,40 @@ async def _run(args: argparse.Namespace) -> int:
     as_of = args.as_of or "2026-09-30"
     try:
         outcome = await runtime.runner.run(run_id, question=args.question, as_of=as_of)
-    finally:
-        pass
+        report = outcome.state.get("final_report") or {}
+        audit = outcome.state.get("citation_audit") or {}
+        if args.out and report:
+            Path(args.out).write_text(to_markdown(report, audit), encoding="utf-8")
+            print(f"报告已写入 {args.out}", file=sys.stderr)
 
-    report = outcome.state.get("final_report") or {}
-    audit = outcome.state.get("citation_audit") or {}
-    if args.out and report:
-        Path(args.out).write_text(to_markdown(report, audit), encoding="utf-8")
-        print(f"报告已写入 {args.out}", file=sys.stderr)
-
-    if args.json:
-        print(
-            json.dumps(
-                {
-                    "run_id": run_id,
-                    "status": str(outcome.status),
-                    "failures": outcome.failures,
-                    "usage": outcome.usage,
-                    "citation_audit": audit,
-                    "node_statuses": outcome.node_statuses,
-                    "report": report,
-                },
-                ensure_ascii=False,
-                indent=2,
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "run_id": run_id,
+                        "status": str(outcome.status),
+                        "failures": outcome.failures,
+                        "usage": outcome.usage,
+                        "citation_audit": audit,
+                        "node_statuses": outcome.node_statuses,
+                        "report": report,
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
             )
-        )
-    else:
-        print(f"run_id   : {run_id}")
-        print(f"状态      : {outcome.status}")
-        print(f"引用覆盖率: {audit.get('coverage', 0):.1%}  引用命中率: {audit.get('quote_hit_rate', 1):.1%}")
-        print(f"成本      : ¥{outcome.usage.get('cost_cny', 0):.4f}")
-        print("-" * 60)
-        print(to_markdown(report, audit) if report else "（未生成报告）")
-    await runtime.aclose()
-    return 0 if report else 1
+        else:
+            print(f"run_id   : {run_id}")
+            print(f"状态      : {outcome.status}")
+            coverage = audit.get("coverage", 0)
+            quote_hit_rate = audit.get("quote_hit_rate", 1)
+            print(f"引用覆盖率: {coverage:.1%}  引用命中率: {quote_hit_rate:.1%}")
+            print(f"成本      : ¥{outcome.usage.get('cost_cny', 0):.4f}")
+            print("-" * 60)
+            print(to_markdown(report, audit) if report else "（未生成报告）")
+        return 0 if report else 1
+    finally:
+        await runtime.aclose()
 
 
 async def _doctor(args: argparse.Namespace) -> int:
