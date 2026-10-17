@@ -53,7 +53,29 @@ class AppRuntime:
 
 
 def build_provider(settings: Settings) -> MarketDataProvider:
-    # 真实数据源（akshare / 巨潮）作为可选扩展位；离线默认 fixture
+    """根据 settings.data_provider 选择数据源，失败时降级到 fixture。
+
+    为什么不在 import 时硬装 akshare：
+    - akshare 是重依赖（~100MB，含 pandas/requests），离线模式不应触碰；
+    - CI 环境没有 akshare，import 就会失败；
+    - 降级语义明确：akshare 不可用时用 fixture，报告标注"示例数据"，功能不中断。
+    """
+    provider_name = settings.data_provider.strip().lower()
+
+    if provider_name == "akshare" and not settings.is_offline:
+        try:
+            from equitylens.tools.providers.akshare import AkshareProvider
+
+            return AkshareProvider()
+        except ImportError:
+            import sys
+
+            print(
+                "[equitylens] akshare 不可用，降级到 fixture 数据源。\n"
+                "安装: pip install akshare（建议 Python 3.12）",
+                file=sys.stderr,
+            )
+
     return FixtureProvider()
 
 
