@@ -11,7 +11,7 @@
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#五分钟跑通)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[看一份真实产出](docs/examples/maotai-2026q3/report.html) · [五分钟跑通](#五分钟跑通) · [设计取舍](docs/engine-design.md)
+[看一份真实产出](https://markliu12.github.io/equitylens/examples/maotai-2026q3/report.html) · [五分钟跑通](#五分钟跑通) · [在线文档](https://markliu12.github.io/equitylens/)
 
 ---
 
@@ -22,7 +22,7 @@
 左侧是正文，右侧是证据链。**引用编号可点击**，点一下跳到对应来源，显示来源分级
 （公告 / 财报 / 行业数据 / 财经媒体）、发布时间和原文片段。
 
-不想装任何东西？直接打开 [静态示例报告](docs/examples/maotai-2026q3/report.html) 点几下引用试试。
+不想装任何东西？直接打开 [静态示例报告](https://markliu12.github.io/equitylens/examples/maotai-2026q3/report.html) 点几下引用试试。
 
 > 示例用的是仓库内置的合成数据集，数值与真实财报无关，URL 指向 `example.invalid`。
 > 它存在的目的是让你在零网络、零费用的条件下验证**结构与逻辑**，而不是看数字好不好看。
@@ -284,4 +284,4 @@ docs/             架构 / 引擎设计 / ADR / 示例产出
 
 ---
 
-<sub>[English README](README.en.md) · [贡献指南](CONTRIBUTING.md) · [数据源说明](docs/data-sources.md)</sub>
+<sub>[English README](README.en.md) · [贡献指南](CONTRIBUTING.md) · [在线文档](https://markliu12.github.io/equitylens/) · [数据源说明](https://markliu12.github.io/equitylens/data-sources/)</sub>

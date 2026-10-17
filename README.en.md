@@ -12,7 +12,7 @@ down to the exact sentence in the underlying filing.
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#quick-start)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[See a real output](docs/examples/maotai-2026q3/report.html) · [Quick start](#quick-start) · [Design notes](docs/engine-design.md)
+[See a real output](https://markliu12.github.io/equitylens/examples/maotai-2026q3/report.html) · [Quick start](#quick-start) · [Docs](https://markliu12.github.io/equitylens/)
 
 ---
 
@@ -156,4 +156,4 @@ advisory language. The bundled dataset is synthetic — do not cite it as real d
 
 MIT licensed.
 
-<sub>[中文说明](README.md) · [Contributing](CONTRIBUTING.md) · [Data sources](docs/data-sources.md)</sub>
+<sub>[中文说明](README.md) · [Contributing](CONTRIBUTING.md) · [Docs](https://markliu12.github.io/equitylens/) · [Data sources](https://markliu12.github.io/equitylens/data-sources/)</sub>
