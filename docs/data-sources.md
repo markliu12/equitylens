@@ -1,6 +1,6 @@
 # 数据源说明
 
-## 1. 当前状态：fixture（示例数据集）
+## 1. 默认状态：fixture（示例数据集）
 
 `src/equitylens/fixtures/seeds/data.py` 是人工构造的示例数据，包含：
 
@@ -36,7 +36,7 @@ class MarketDataProvider(Protocol):
 
 | 数据 | 候选源 | 注意点 |
 |---|---|---|
-| A 股行情 / 财务 | akshare（免费） | 接口名变动频繁，需适配层 + 契约测试；Python 3.13 轮子不全，建议 3.12 |
+| A 股行情 / 财务 | akshare（免费） | ✅ 已实现（懒加载 + 降级 + 25 契约测试）；接口名变动频繁，改动集中在 `providers/akshare.py` |
 | 公司公告 | 巨潮资讯（官方披露） | 一级证据，优先级最高；注意分页与频率 |
 | 财经新闻 | 东方财富 / 新浪财经 | 三级证据，只存标题 + ≤500 字摘录 + 链接 |
 | 行业数据 | 国家统计局 / 行业协会 | 口径差异大，不同来源不要强行合并 |
@@ -59,9 +59,12 @@ class MarketDataProvider(Protocol):
 ## 5. 切换方式
 
 ```bash
+pip install akshare   # 可选扩展，非核心依赖（建议 Python 3.12，3.13 轮子可能不全）
 # .env
 APP_MODE=dev
-DATA_PROVIDER=akshare   # 待实现后生效
+DATA_PROVIDER=akshare
 ```
 
-`runtime.build_provider()` 是唯一的切换点，目前直接返回 `FixtureProvider`。
+`runtime.build_provider()` 是唯一的切换点：`DATA_PROVIDER=akshare` 且非 offline 时加载
+`AkshareProvider`；akshare 未安装、或处于 offline 模式时，自动降级到 `FixtureProvider`
+（报告会标注"示例数据"，功能不中断）。
