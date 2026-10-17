@@ -1,8 +1,10 @@
 """运行管理器：任务注册、并发闸门、取消、启动恢复。
 
-单进程内用 dict[run_id, Task] 就够了。刻意没有引入 Celery/Redis：
-本项目的瓶颈是模型调用，不是调度吞吐；引入消息队列后，checkpoint 语义、
-取消语义、事件顺序都要重做一遍，收益却几乎为零。扩展路径写在 ADR 里。
+持久化在 SqliteStore（运行记录 / checkpoint / 事件全部落库，重启可恢复）；
+内存里的 dict[run_id, Task] 只是 asyncio 任务句柄，句柄本身无法也不需持久化。
+刻意没有引入 Celery/Redis：本项目的瓶颈是模型调用，不是调度吞吐；
+引入消息队列后，checkpoint 语义、取消语义、事件顺序都要重做一遍，
+收益却几乎为零。扩展路径写在 ADR 里。
 """
 
 from __future__ import annotations

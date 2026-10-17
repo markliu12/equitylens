@@ -52,6 +52,31 @@ export function getModels(): Promise<{
  * 2) 具名事件需要为每种 event 单独注册监听，新增事件类型就容易漏。
  * 自己读流还能在刷新后精确续传，不丢任何一条事件。
  */
+/**
+ * 解析 SSE 缓冲区：按空行切帧，拼接多行 data:，跳过心跳与半包。
+ * 返回已解析的事件与未完成的残余 buffer（留给下一次读取继续拼）。
+ * 独立导出是为了可单测——SSE 续传正确性是整个前端的命脉。
+ */
+export function parseSseBuffer(buffer: string): { events: StreamEvent[]; rest: string } {
+  const chunks = buffer.split("\n\n");
+  const rest = chunks.pop() ?? "";
+  const events: StreamEvent[] = [];
+  for (const chunk of chunks) {
+    const dataLines = chunk
+      .split("\n")
+      .filter((line) => line.startsWith("data:"))
+      .map((line) => line.slice(5).trim());
+    if (dataLines.length === 0) continue;
+    try {
+      const payload = JSON.parse(dataLines.join("\n")) as StreamEvent;
+      if (payload.type) events.push(payload);
+    } catch {
+      // 忽略心跳与半包
+    }
+  }
+  return { events, rest };
+}
+
 export async function streamRun(
   runId: string,
   options: { lastSeq?: number; signal?: AbortSignal; onEvent: (event: StreamEvent) => void },
@@ -70,20 +95,8 @@ export async function streamRun(
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
-    const chunks = buffer.split("\n\n");
-    buffer = chunks.pop() ?? "";
-    for (const chunk of chunks) {
-      const dataLines = chunk
-        .split("\n")
-        .filter((line) => line.startsWith("data:"))
-        .map((line) => line.slice(5).trim());
-      if (dataLines.length === 0) continue;
-      try {
-        const payload = JSON.parse(dataLines.join("\n")) as StreamEvent;
-        if (payload.type) options.onEvent(payload);
-      } catch {
-        // 忽略心跳与半包
-      }
-    }
+    const { events, rest } = parseSseBuffer(buffer);
+    buffer = rest;
+    for (const event of events) options.onEvent(event);
   }
 }

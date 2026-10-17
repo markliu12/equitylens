@@ -36,8 +36,7 @@ jobs:
         run: ruff check src tests
 
       - name: Type check
-        run: mypy src/equitylens/engine src/equitylens/agents/schemas.py
-        continue-on-error: true
+        run: mypy
 
       - name: Test with coverage (offline, no API key required)
         env:
@@ -50,6 +49,15 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: CLI smoke test
         env:
@@ -70,4 +78,5 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
+      - run: npm test
       - run: npm run build
