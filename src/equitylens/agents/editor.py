@@ -23,7 +23,15 @@ class EditorAgent(BaseAgent):
         super().__init__(
             "editor_draft",
             deps=("verdict",),
-            reads=("entity", "as_of", "analyst_reports", "verdict", "evidence", "evidence_gaps"),
+            reads=(
+                "entity",
+                "as_of",
+                "analyst_reports",
+                "verdict",
+                "evidence",
+                "evidence_gaps",
+                "research_data",
+            ),
             writes=("draft_report",),
             policy=NodePolicy(timeout_s=180, max_attempts=2, concurrency="llm"),
             label="报告撰写",
@@ -63,6 +71,10 @@ class EditorAgent(BaseAgent):
                 for item in ctx.view.get("analyst_reports") or []
             ],
             "verdict": ctx.view.get("verdict") or {},
+            "derived": {
+                "flags": ((ctx.view.get("research_data") or {}).get("derived") or {}).get("flags")
+                or [],
+            },
             "evidence": refs,
             "data_gaps": list(ctx.view.get("evidence_gaps") or []),
             "disclaimer": DISCLAIMER,

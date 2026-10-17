@@ -16,7 +16,22 @@ SEEDS: dict[str, dict] = {
         },
         "as_of": "2026-09-30",
         "financials": {
-            "signals": {"revenue_growth": 0.156, "net_margin": 0.524},
+            #: 结构化信号：只放能直接参与交叉计算的原始数值，不放任何结论。
+            #: 缺失的项就不要给键——派生层会跳过并记录 unavailable，而不是当成 0 猜。
+            "signals": {
+                "revenue_growth": 0.156,
+                "net_margin": 0.524,
+                "net_margin_change": 0.003,
+                "net_profit": 862.3,
+                "cash_flow": 912.6,
+                "cash_flow_growth": 0.098,
+                "q_revenue_growth": -0.012,
+                "q_revenue_qoq": -0.041,
+                "contract_liability_growth": 0.121,
+                "dividend_payout": 0.391,
+                "price_hike_pct": 0.03,
+                "capacity_new_tons": 1.98,
+            },
             "items": [
                 {
                     "key": "fin_revenue",
@@ -181,6 +196,9 @@ SEEDS: dict[str, dict] = {
         "industry": {
             "name": "白酒",
             "cycle_stage": "放缓",
+            #: 行业层面的原始增速，用于和公司增速做超额对比（百分点）
+            "output_growth": -0.032,
+            "output_growth_change_pp": 0.006,
             "summary": (
                 "白酒行业进入存量竞争阶段：高端价格带需求韧性相对较强，"
                 "次高端库存去化仍在进行，行业产量连续三季负增长。"

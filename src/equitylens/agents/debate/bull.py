@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from equitylens.agents.base import BaseAgent, evidence_brief
+from equitylens.agents.base import BaseAgent, derived_view, evidence_brief
 from equitylens.agents.schemas import Argument
 from equitylens.engine.node import NodeContext
 from equitylens.engine.types import FailureKind, NodePolicy, OnFailure, Patch
@@ -19,7 +19,7 @@ class BullAgent(BaseAgent):
         super().__init__(
             "debater_bull",
             deps=("analyst_merge",),
-            reads=("entity", "evidence", "analyst_reports", "bear_argument"),
+            reads=("entity", "evidence", "analyst_reports", "bear_argument", "research_data"),
             writes=("bull_argument",),
             policy=NodePolicy(
                 timeout_s=150, max_attempts=2, on_failure=OnFailure.DEGRADE, concurrency="llm"
@@ -39,8 +39,9 @@ class BullAgent(BaseAgent):
                  "claims": (item.get("claims") or [])[:3]}
                 for item in ctx.view.get("analyst_reports") or []
             ],
-            "evidence": evidence_brief(list(ctx.view.get("evidence") or []), limit=8),
+            "evidence": evidence_brief(list(ctx.view.get("evidence") or []), limit=12),
             "opponent": opponent,
+            **derived_view(ctx.view),
         }
 
     async def run(self, ctx: NodeContext) -> Patch:
