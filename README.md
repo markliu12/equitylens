@@ -181,7 +181,7 @@ cp .env.example .env
 #   LLM_MODEL=deepseek-chat
 ```
 
-> 真实数据源（akshare / 巨潮）在下一阶段接入，见 [docs/data-sources.md](docs/data-sources.md)。
+> 真实数据源 akshare 已适配（`DATA_PROVIDER=akshare`），需 `pip install akshare`（建议 Python 3.12）。详见 [docs/data-sources.md](docs/data-sources.md)。
 
 ---
 
@@ -209,7 +209,7 @@ src/equitylens/
 
 web/              Vite + React + TS（无 UI 框架，手写 CSS）
 tests/            97 个测试：单元 + 集成 + 离线端到端
-docs/             架构 / 引擎设计 / ADR / 部署说明
+docs/             架构 / 引擎设计 / ADR
 ```
 
 ---
@@ -235,8 +235,8 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 
 ## 已知限制（诚实清单）
 
-1. **数据是合成的**：`fixtures/` 里是人工构造的示例数据集（自称"示例数据集"，数值与真实财报无关），
-   用于保证 CI 与演示可离线复现。真实数据源接入是下一阶段工作。
+1. **默认数据是合成的**：`fixtures/` 里是人工构造的示例数据集（自称"示例数据集"，数值与真实财报无关），
+   用于保证 CI 与演示可离线复现。真实数据源 akshare 已适配，设 `DATA_PROVIDER=akshare` 并 `pip install akshare` 即可切换；巨潮公告待接。
 2. **不做投资建议**：系统只产出研究整理，合规节点会拦截买卖建议、目标价、收益承诺类表述。
 3. **单进程**：任务表在内存里，`--workers > 1` 会导致状态分裂。这是刻意的取舍（见 ADR-0001）。
 4. **没有 PDF**：导出 Markdown / HTML（浏览器打印为 PDF）。Windows 上 WeasyPrint 依赖 GTK，刻意不用。
@@ -250,7 +250,7 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 - [x] 9 个 Agent + 多空辩论 + 合规风控
 - [x] 强制引用溯源 + 审计 JSON
 - [x] FastAPI + SSE + React 前端 + 离线 fixture 全链路
-- [ ] 真实数据源（akshare / 巨潮）与限流、反爬兜底
+- [~] 真实数据源 akshare 已适配（Provider + 降级 + 契约测试）；巨潮公告待接
 - [ ] 25 题评测集 + RAGAS 风格指标 + 配对 bootstrap A/B
 - [ ] 公网部署（回放模式 + 邀请码 + 日预算）
 - [ ] 技术面分析师（代码位已留，默认关闭）
