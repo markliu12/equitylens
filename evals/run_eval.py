@@ -29,6 +29,12 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+# Windows 控制台/管道的默认编码是 cp1252，直接 print 中文会 UnicodeEncodeError。
+# 在 CI（windows-latest）上表现为整个评测进程返回非 0，因此这里强制 UTF-8。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 from equitylens.config import Settings  # noqa: E402
 from equitylens.runtime import build_runtime  # noqa: E402
 

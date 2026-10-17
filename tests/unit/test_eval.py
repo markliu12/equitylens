@@ -66,6 +66,8 @@ def test_ab_compare_cli_end_to_end(tmp_path: Path):
         [sys.executable, str(ROOT / "evals" / "ab_compare.py"), str(baseline), str(candidate)],
         capture_output=True,
         text=True,
+        encoding="utf-8",  # Windows runner 默认 cp1252，必须显式指定
+        errors="replace",
     )
     assert proc.returncode == 0
     assert "coverage" in proc.stdout
@@ -79,6 +81,8 @@ def test_run_eval_cli_smoke(limit: int, tmp_path: Path, monkeypatch: pytest.Monk
         [sys.executable, str(ROOT / "evals" / "run_eval.py"), "--label", "smoke", "--limit", str(limit)],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         cwd=ROOT,
     )
     assert proc.returncode == 0, proc.stderr
