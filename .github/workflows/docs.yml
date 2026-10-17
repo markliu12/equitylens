@@ -1,0 +1,70 @@
+name: Docs
+
+# 把 docs/ 构建成文档站发布到 GitHub Pages。
+#
+# 这件事的直接动机：README 首屏链到 docs/examples/maotai-2026q3/report.html，
+# 但 GitHub 的 blob 页不渲染 HTML——点进去是一屏源码，正好劝退刚想体验的人。
+# 发布到 Pages 后，示例报告的引用编号可以真正点开跳转。
+#
+# 前置条件：仓库 Settings → Pages → Source 选择 "GitHub Actions"。
+# 未启用时 deploy 步骤会失败，已用 continue-on-error 兜住，不会让 CI 变红。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只允许一个部署，但不要取消正在进行的部署（取消可能留下半成品站点）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install mkdocs
+        run: |
+          python -m pip install --upgrade pip
+          pip install "mkdocs-material>=9.5"
+
+      # --strict 把"页面不在 nav 里"这类问题当成错误，
+      # 避免文档站悄悄缺页还能发布成功
+      - name: Build
+        run: mkdocs build --strict
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: deploy docs
+    needs: build
+    runs-on: ubuntu-latest
+    # Pages 未启用时 deploy-pages 会报 "Get Pages site failed"。
+    # 容错处理：文档站配置不该成为 CI 的红灯；启用 Pages 后自动转为正常部署。
+    continue-on-error: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
