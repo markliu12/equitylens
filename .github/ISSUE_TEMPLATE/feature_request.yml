@@ -1,0 +1,57 @@
+name: Feature request
+description: 提一个功能或改进建议
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提之前建议先看一眼 `CONTRIBUTING.md` 里的两节：
+        **How to add a new data provider** 和 **How to add a derived signal**。
+        如果你的需求落在这两类里，通常不需要改引擎。
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 影响范围
+      options:
+        - engine（调度 / 状态 / 恢复 / 预算）
+        - agents（提示词 / 角色 / 辩论）
+        - tools（数据源 / 证据链 / 派生信号）
+        - report（渲染 / 引用审计）
+        - api / web（接口与界面）
+        - docs / 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你遇到的具体问题
+      description: 描述场景，不要只写"希望支持 X"
+      placeholder: 例如：我想跑港股，但 Provider 只认 A 股代码，报错 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望的方案
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 考虑过的替代方案
+
+  - type: dropdown
+    id: willingness
+    attributes:
+      label: 是否愿意提交 PR
+      options:
+        - 愿意，已有思路
+        - 愿意，需要指导
+        - 暂时不，先讨论方案
+    validations:
+      required: true

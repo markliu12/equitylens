@@ -1,0 +1,84 @@
+site_name: EquityLens 研镜
+site_description: 每条结论都能点回原文的 A 股研究报告系统
+site_url: https://markliu12.github.io/equitylens/
+repo_url: https://github.com/markliu12/equitylens
+repo_name: markliu12/equitylens
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+
+nav:
+  - 概述: index.md
+  - 使用:
+      - 快速开始与用法: USAGE.md
+      - 数据源: data-sources.md
+  - 设计:
+      - 总体架构: architecture.md
+      - 编排引擎: engine-design.md
+      - 架构决策记录:
+          - ADR-0001 不引入编排框架: adr/0001-no-orchestration-framework.md
+          - ADR-0002 黑板状态模型: adr/0002-blackboard-state-model.md
+          - ADR-0003 checkpoint 粒度: adr/0003-checkpoint-granularity.md
+          - ADR-0004 evidence_id 方案: adr/0004-evidence-id-scheme.md
+  - 示例产出: examples/README.md
+  - 贡献指南: https://github.com/markliu12/equitylens/blob/main/CONTRIBUTING.md
+
+# 不发布到站点的文档：
+# 本地工作笔记，
+# 以及示例产物的 Markdown 版本（HTML 版已作为静态页面链接）
+exclude_docs: |
+  local-notes.md
+  examples/maotai-2026q3/report.md
+
+# 不发布到站点的文档：
+# 本地工作笔记，
+# 以及示例产物的 Markdown 版本（HTML 版已作为静态页面链接）
+exclude_docs: |
+  local-notes.md
+  examples/maotai-2026q3/report.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/markliu12/equitylens
