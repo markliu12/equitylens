@@ -19,6 +19,11 @@ from typing import Any
 
 METRICS = ["coverage", "quote_hit_rate", "future_leaks", "n_claims"]
 
+# 同 run_eval：Windows 管道默认 cp1252，中文输出会直接抛 UnicodeEncodeError。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 
 def load_results(path: Path) -> dict[str, dict[str, Any]]:
     rows: dict[str, dict[str, Any]] = {}
