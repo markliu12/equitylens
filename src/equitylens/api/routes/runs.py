@@ -46,13 +46,19 @@ async def create_run(
     payload: CreateRunRequest,
     request: Request,
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    demo_invite_code: str | None = Header(default=None, alias="X-Demo-Invite-Code"),
 ) -> JSONResponse:
     settings = _runtime(request).settings
-    if settings.app_mode == "demo" and not settings.demo_live_enabled:
-        raise HTTPException(
-            status_code=403,
-            detail="演示环境已关闭实时调用，可在首页查看预生成报告",
-        )
+    if settings.app_mode == "demo":
+        if not settings.demo_live_enabled:
+            raise HTTPException(
+                status_code=403,
+                detail="演示环境已关闭实时调用，可在首页查看预生成报告",
+            )
+        if not settings.invite_codes:
+            raise HTTPException(status_code=503, detail="演示环境未配置邀请码")
+        if demo_invite_code not in settings.invite_codes:
+            raise HTTPException(status_code=403, detail="邀请码无效")
 
     cache: dict[str, str] = request.app.state.idempotency
     if idempotency_key and idempotency_key in cache:
@@ -63,6 +69,8 @@ async def create_run(
         )
 
     result = await _manager(request).start(payload.question, as_of=payload.as_of)
+    if result.get("error") == "daily_budget_exhausted":
+        raise HTTPException(status_code=429, detail="今日演示预算已用尽，请明日再试")
     if idempotency_key:
         cache[idempotency_key] = result["run_id"]
     return JSONResponse(result, status_code=201)

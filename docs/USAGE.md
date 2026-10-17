@@ -21,7 +21,10 @@ EquityLens 把这件事拆成 13 个可观测的步骤，交给 9 个分工不�
 ```bash
 # 终端 1：起服务
 cd C:\Users\Mark\Desktop\my_new_project
-C:\Users\Mark\.workbuddy\binaries\python\envs\equitylens\Scripts\python.exe -m uvicorn equitylens.api.app:create_app --factory --port 8000
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev]"
+python -m uvicorn equitylens.api.app:create_app --factory --port 8000
 ```
 
 浏览器打开 http://127.0.0.1:8000
@@ -115,7 +118,7 @@ copy .env.example .env
 # 3. 重启服务
 ```
 
-> 国内模型都兼容 OpenAI 协议，换供应商只改 `LLM_BASE_URL` + `LLM_MODEL`。
+> 国内模型都兼容 OpenAI 协议，换供应商只改 `LLM_BASE_URL` + `LLM_MODEL`。当前数据仍来自本地示例集；接入真实数据源后才能进行真实研究。
 > 成本参考：一次完整研究约 13 次模型调用、2.6 万 token，DeepSeek 大概几分钱。
 
 ## 5. 几个常用操作

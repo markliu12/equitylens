@@ -69,6 +69,46 @@ def test_validation_rejects_short_question(client: TestClient) -> None:
     assert client.post("/api/runs", json={"question": "x"}).status_code == 422
 
 
+def test_demo_live_run_requires_valid_invite(tmp_path: Path) -> None:
+    settings = Settings(
+        app_mode="demo",
+        demo_live_enabled=True,
+        demo_invite_codes="portfolio-demo",
+        db_path=str(tmp_path / "api.db"),
+        cache_dir=str(tmp_path / "cache"),
+        artifact_dir=str(tmp_path / "artifacts"),
+    )
+    with TestClient(create_app(settings)) as demo_client:
+        payload = {"question": "分析贵州茅台"}
+        assert demo_client.post("/api/runs", json=payload).status_code == 403
+        assert (
+            demo_client.post(
+                "/api/runs", json=payload, headers={"X-Demo-Invite-Code": "wrong"}
+            ).status_code
+            == 403
+        )
+
+
+def test_demo_rejects_run_that_cannot_fit_daily_budget(tmp_path: Path) -> None:
+    settings = Settings(
+        app_mode="demo",
+        demo_live_enabled=True,
+        demo_invite_codes="portfolio-demo",
+        daily_budget_cny=0.5,
+        budget_max_cost_cny=0.6,
+        db_path=str(tmp_path / "api.db"),
+        cache_dir=str(tmp_path / "cache"),
+        artifact_dir=str(tmp_path / "artifacts"),
+    )
+    with TestClient(create_app(settings)) as demo_client:
+        response = demo_client.post(
+            "/api/runs",
+            json={"question": "分析贵州茅台"},
+            headers={"X-Demo-Invite-Code": "portfolio-demo"},
+        )
+    assert response.status_code == 429
+
+
 def test_unknown_run_returns_404(client: TestClient) -> None:
     assert client.get("/api/runs/run_missing").status_code == 404
     assert client.get("/api/runs/run_missing/events").status_code == 404
