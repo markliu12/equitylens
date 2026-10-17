@@ -35,3 +35,6 @@ Thumbs.db
 # ---- 本地草稿（不入库）----
 docs/local-drafts.md
 docs/local-qa.md
+
+# 评测运行产物（每题一行指标，按需复现，不入库）
+evals/results/
