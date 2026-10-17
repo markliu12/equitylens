@@ -3,7 +3,8 @@
 > **不依赖 LangChain / LangGraph，手写 DAG 编排引擎的行业研究多智能体系统。**
 > 每条结论强制挂 `evidence_id`，全程可 checkpoint、可断点恢复、可回放、可评测、成本可控。
 
-[![tests](https://img.shields.io/badge/tests-69%20passed-brightgreen)](#测试)
+[![CI](https://github.com/markliu12/equitylens/actions/workflows/ci.yml/badge.svg)](https://github.com/markliu12/equitylens/actions/workflows/ci.yml)
+[![tests](https://img.shields.io/badge/tests-97%20passed-brightgreen)](#测试)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#快速开始)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -206,7 +207,7 @@ src/equitylens/
 └─ fixtures/      示例数据集（合成数据）
 
 web/              Vite + React + TS（无 UI 框架，手写 CSS）
-tests/            69 个测试：单元 + 集成 + 离线端到端
+tests/            97 个测试：单元 + 集成 + 离线端到端
 docs/             架构 / 引擎设计 / ADR / 部署说明
 ```
 
@@ -215,7 +216,7 @@ docs/             架构 / 引擎设计 / ADR / 部署说明
 ## 测试
 
 ```bash
-pytest -q        # 69 passed
+pytest -q        # 97 passed
 ruff check src   # 0 error
 ```
 
