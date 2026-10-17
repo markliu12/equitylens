@@ -110,4 +110,5 @@ is the place to argue about it — not a silent regression.
 
 ## Questions?
 
-Open a [discussion](https://github.com/markliu12/equitylens/discussions) or an issue.
+Open an [issue](https://github.com/markliu12/equitylens/issues)。
+使用问题、bug、功能建议都欢迎。提 bug 时请附上 `equitylens doctor` 的输出和复现命令。
