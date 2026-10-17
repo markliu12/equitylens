@@ -233,7 +233,7 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 
 ---
 
-## 已知限制（诚实清单）
+## 已知限制
 
 1. **默认数据是合成的**：`fixtures/` 里是人工构造的示例数据集（自称"示例数据集"，数值与真实财报无关），
    用于保证 CI 与演示可离线复现。真实数据源 akshare 已适配，设 `DATA_PROVIDER=akshare` 并 `pip install akshare` 即可切换；巨潮公告待接。
@@ -250,7 +250,8 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 - [x] 9 个 Agent + 多空辩论 + 合规风控
 - [x] 强制引用溯源 + 审计 JSON
 - [x] FastAPI + SSE + React 前端 + 离线 fixture 全链路
-- [~] 真实数据源 akshare 已适配（Provider + 降级 + 契约测试）；巨潮公告待接
+- [x] 真实数据源 akshare（Provider + fixture 降级 + 契约测试）
+- [ ] 巨潮公告接入
 - [ ] 25 题评测集 + RAGAS 风格指标 + 配对 bootstrap A/B
 - [ ] 公网部署（回放模式 + 邀请码 + 日预算）
 - [ ] 技术面分析师（代码位已留，默认关闭）
