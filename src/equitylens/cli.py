@@ -19,6 +19,19 @@ from equitylens.report.renderer import to_markdown
 from equitylens.runtime import build_runtime
 
 
+def ensure_utf8_console() -> None:
+    """Make Chinese CLI output work in Windows terminals and CI logs.
+
+    GitHub Actions' Windows PowerShell can otherwise expose a legacy code
+    page such as cp1252, which raises UnicodeEncodeError when printing the
+    Chinese report summary.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8")
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="equitylens", description="EquityLens 研镜 — 多智能体行业研究工作台"
@@ -117,6 +130,7 @@ async def _doctor(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    ensure_utf8_console()
     args = parse_args(argv)
     if args.cmd == "run":
         return asyncio.run(_run(args))
