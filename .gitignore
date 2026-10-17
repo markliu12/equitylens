@@ -1,0 +1,30 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---- 运行时数据（不入库）----
+data/
+*.db
+*.db-wal
+*.db-shm
+logs/
+
+# ---- 前端 ----
+web/node_modules/
+web/dist/
+
+# ---- 环境与编辑器 ----
+.env
+.env.local
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

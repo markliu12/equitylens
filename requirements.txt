@@ -1,0 +1,15 @@
+# EquityLens 运行依赖（与 pyproject.toml 保持一致，便于无 build 环境直接安装）
+fastapi>=0.115
+uvicorn>=0.30
+pydantic>=2.7
+pydantic-settings>=2.3
+httpx>=0.27
+aiosqlite>=0.20
+jinja2>=3.1
+pyyaml>=6.0
+
+# 开发/测试
+pytest>=8.2
+pytest-asyncio>=0.23
+respx>=0.21
+ruff>=0.6
