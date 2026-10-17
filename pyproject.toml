@@ -69,7 +69,13 @@ exclude_lines = [
 
 [tool.mypy]
 python_version = "3.12"
-packages = ["src/equitylens/engine", "src/equitylens/agents/schemas.py"]
+mypy_path = "src"
+files = [
+    "src/equitylens/engine",
+    "src/equitylens/agents/schemas.py",
+    "src/equitylens/llm",
+    "src/equitylens/tools",
+]
 ignore_missing_imports = true
 warn_return_any = true
 warn_unused_ignores = true

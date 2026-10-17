@@ -1,0 +1,161 @@
+# EquityLens 评测题集（25 题）
+#
+# 字段：
+#   id        题目唯一 id
+#   question  交给系统的研究问题
+#   as_of     基准日（防前视偏差检查以此为准）
+#   tags      行业 / 能力标签，用于分维度统计
+#   offline   true 表示离线 fixture 可跑（当前仅贵州茅台），CI 门禁只跑这些
+#
+# 评审口径：offline=true 的题必须全部通过确定性门禁（覆盖率 / 命中率 / 无前视）；
+# 其余题在接入真实数据源后跑 live 评测。
+
+- id: q01
+  question: 分析贵州茅台最近一期经营情况与行业景气度
+  as_of: "2026-09-30"
+  tags: [白酒, 基本面]
+  offline: true
+
+- id: q02
+  question: 贵州茅台的现金流质量与分红可持续性如何
+  as_of: "2026-09-30"
+  tags: [白酒, 现金流]
+  offline: true
+
+- id: q03
+  question: 贵州茅台相对五粮液、泸州老窖的估值溢价是否合理
+  as_of: "2026-09-30"
+  tags: [白酒, 估值比较]
+  offline: true
+
+- id: q04
+  question: 近期舆情对贵州茅台品牌形象的影响评估
+  as_of: "2026-09-30"
+  tags: [白酒, 舆情]
+  offline: true
+
+- id: q05
+  question: 白酒行业产量增速放缓对贵州茅台的影响
+  as_of: "2026-09-30"
+  tags: [白酒, 行业]
+  offline: true
+
+- id: q06
+  question: 分析宁德时代动力电池业务的竞争格局
+  as_of: "2026-09-30"
+  tags: [新能源, 竞争格局]
+  offline: false
+
+- id: q07
+  question: 比亚迪垂直整合模式的成本优势是否可持续
+  as_of: "2026-09-30"
+  tags: [汽车, 商业模式]
+  offline: false
+
+- id: q08
+  question: 分析中芯国际先进制程进展与国产化替代空间
+  as_of: "2026-09-30"
+  tags: [半导体, 国产化]
+  offline: false
+
+- id: q09
+  question: 恒瑞医药创新药管线的商业化前景
+  as_of: "2026-09-30"
+  tags: [医药, 创新药]
+  offline: false
+
+- id: q10
+  question: 分析招商银行零售转型的成效与资产质量
+  as_of: "2026-09-30"
+  tags: [银行, 零售]
+  offline: false
+
+- id: q11
+  question: 隆基绿能在光伏价格战中的盈利韧性
+  as_of: "2026-09-30"
+  tags: [光伏, 价格战]
+  offline: false
+
+- id: q12
+  question: 分析海康威视 AI 安防业务的增长驱动
+  as_of: "2026-09-30"
+  tags: [计算机, AI]
+  offline: false
+
+- id: q13
+  question: 中国神华煤电一体化在电价市场化下的防御性
+  as_of: "2026-09-30"
+  tags: [能源, 防御性]
+  offline: false
+
+- id: q14
+  question: 分析美团本地生活业务的竞争壁垒变化
+  as_of: "2026-09-30"
+  tags: [互联网, 竞争]
+  offline: false
+
+- id: q15
+  question: 药明康德地缘风险对订单的影响评估
+  as_of: "2026-09-30"
+  tags: [医药, CXO, 风险]
+  offline: false
+
+- id: q16
+  question: 分析长江电力水电资产的类债属性与估值
+  as_of: "2026-09-30"
+  tags: [公用事业, 估值]
+  offline: false
+
+- id: q17
+  question: 立讯精密大客户依赖度与多元化进展
+  as_of: "2026-09-30"
+  tags: [电子, 客户集中度]
+  offline: false
+
+- id: q18
+  question: 分析牧原股份猪周期下的成本控制能力
+  as_of: "2026-09-30"
+  tags: [农业, 周期]
+  offline: false
+
+- id: q19
+  question: 金山办公 AI 订阅对 ARPU 的提升空间
+  as_of: "2026-09-30"
+  tags: [软件, SaaS]
+  offline: false
+
+- id: q20
+  question: 分析万华化学 MDI 景气度与新材料布局
+  as_of: "2026-09-30"
+  tags: [化工, 景气度]
+  offline: false
+
+- id: q21
+  question: 中国中免离岛免税政策的业绩弹性
+  as_of: "2026-09-30"
+  tags: [消费, 政策]
+  offline: false
+
+- id: q22
+  question: 分析汇川技术工控业务的国产替代节奏
+  as_of: "2026-09-30"
+  tags: [工业自动化, 国产替代]
+  offline: false
+
+- id: q23
+  question: 紫金矿业铜金双主业的产量增长确定性
+  as_of: "2026-09-30"
+  tags: [有色, 产量]
+  offline: false
+
+- id: q24
+  question: 分析科大讯飞大模型商业化的进展与瓶颈
+  as_of: "2026-09-30"
+  tags: [计算机, 大模型]
+  offline: false
+
+- id: q25
+  question: 伊利股份乳制品需求疲软的应对策略评估
+  as_of: "2026-09-30"
+  tags: [食品饮料, 需求]
+  offline: false

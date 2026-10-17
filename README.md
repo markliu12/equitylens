@@ -4,8 +4,8 @@
 > 每条结论强制挂 `evidence_id`，全程可 checkpoint、可断点恢复、可回放、可评测、成本可控。
 
 [![CI](https://github.com/markliu12/equitylens/actions/workflows/ci.yml/badge.svg)](https://github.com/markliu12/equitylens/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-97%20passed-brightgreen)](#测试)
-[![coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](#测试)
+[![tests](https://img.shields.io/badge/tests-106%20passed-brightgreen)](#测试)
+[![coverage](https://codecov.io/gh/markliu12/equitylens/branch/main/graph/badge.svg)](https://codecov.io/gh/markliu12/equitylens)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue)](#快速开始)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -217,9 +217,9 @@ docs/             架构 / 引擎设计 / ADR
 ## 测试
 
 ```bash
-pytest -q --cov=src/equitylens --cov-report=term-missing   # 97 passed, 84% coverage
+pytest -q --cov=src/equitylens --cov-report=term-missing   # 106 passed, 84% coverage
 ruff check src tests                                        # 0 error
-mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
+mypy                                                            # type check（engine / agents.schemas / llm / tools，30 个文件）
 ```
 
 覆盖的关键断言：
@@ -238,9 +238,12 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 1. **默认数据是合成的**：`fixtures/` 里是人工构造的示例数据集（自称"示例数据集"，数值与真实财报无关），
    用于保证 CI 与演示可离线复现。真实数据源 akshare 已适配，设 `DATA_PROVIDER=akshare` 并 `pip install akshare` 即可切换；巨潮公告待接。
 2. **不做投资建议**：系统只产出研究整理，合规节点会拦截买卖建议、目标价、收益承诺类表述。
-3. **单进程**：任务表在内存里，`--workers > 1` 会导致状态分裂。这是刻意的取舍（见 ADR-0001）。
+3. **单进程调度**：运行记录、节点执行、checkpoint、事件全部持久化在 SQLite（`data/runs.db`），
+   进程重启后 RUNNING/QUEUED 的运行会自动断点续跑（有持久化测试门禁）。
+   但 asyncio 任务句柄是单进程的，`--workers > 1` 会导致调度状态分裂，扩展路径见 ADR-0001。
 4. **没有 PDF**：导出 Markdown / HTML（浏览器打印为 PDF）。Windows 上 WeasyPrint 依赖 GTK，刻意不用。
-5. **评测集未完成**：25 题评测集与 A/B 回归框架是下一阶段内容，当前只有确定性指标门禁。
+5. **评测集 MVP 已落地**：`evals/` 含 25 题题集（5 题离线门禁 + 20 题 live）、
+   确定性指标运行器与配对 bootstrap A/B 对比脚本；RAGAS 风格的模型裁判指标待接入。
 
 ---
 
@@ -252,7 +255,7 @@ mypy src/equitylens/engine src/equitylens/agents/schemas.py # type check
 - [x] FastAPI + SSE + React 前端 + 离线 fixture 全链路
 - [x] 真实数据源 akshare（Provider + fixture 降级 + 契约测试）
 - [ ] 巨潮公告接入
-- [ ] 25 题评测集 + RAGAS 风格指标 + 配对 bootstrap A/B
+- [x] 25 题评测集 + 确定性指标运行器 + 配对 bootstrap A/B（`evals/`，模型裁判指标待接）
 - [ ] 公网部署（回放模式 + 邀请码 + 日预算）
 - [ ] 技术面分析师（代码位已留，默认关闭）
 
