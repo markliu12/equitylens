@@ -43,18 +43,8 @@ nav:
   - 示例产出: examples/README.md
   - 贡献指南: https://github.com/markliu12/equitylens/blob/main/CONTRIBUTING.md
 
-# 不发布到站点的文档：
-# 本地工作笔记，
-# 以及示例产物的 Markdown 版本（HTML 版已作为静态页面链接）
+# 不发布到站点的文档：示例产物的 Markdown 版本（HTML 版已作为静态页面链接）
 exclude_docs: |
-  local-notes.md
-  examples/maotai-2026q3/report.md
-
-# 不发布到站点的文档：
-# 本地工作笔记，
-# 以及示例产物的 Markdown 版本（HTML 版已作为静态页面链接）
-exclude_docs: |
-  local-notes.md
   examples/maotai-2026q3/report.md
 
 markdown_extensions:
